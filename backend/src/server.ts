@@ -15,6 +15,7 @@ app.use(cors({
 }))
 app.use(helmet())
 app.use(rateLimiter)
+app.set('trust proxy',1)
 type responseType = {
     data:any;
     ok:boolean;
