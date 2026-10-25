@@ -88,9 +88,9 @@ recur()
 app.get('/getStatus/:game',async(req:express.Request<requestType>,res:express.Response<responseType>)=>{
     let game = req.params.game
     if(game === 'centaura'){
-        res.json({data:centaura,ok:true,msg:'success'})
+        return res.json({data:centaura,ok:true,msg:'success'})
     }else if(game === 'deadahead'){
-        res.json({data:deadahead,ok:true,msg:'success'})
+        return res.json({data:deadahead,ok:true,msg:'success'})
     }
 })
 app.listen(3000)
