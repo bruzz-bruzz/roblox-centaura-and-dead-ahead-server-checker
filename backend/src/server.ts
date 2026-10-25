@@ -21,23 +21,53 @@ type responseType = {
     msg:string
 }
 type requestType = {
-    game:"centaura"|'dead_ahead'
+    game:"centaura"|'deadahead'
 }
-app.get('/getStatus/:game',async(req:express.Request<requestType>,res:express.Response<responseType>)=>{
-    try{
-        let d = process.env.CENTAURA
-        if(req.params.game === 'dead_ahead'){
-            d = process.env.DEADAHEAD
-        }
-        const response = await axios.get(`https://games.roblox.com/v1/games/${d}/servers/Public`)
-        const data = response.data
-        const ret = []
+let centaura = {}
+let deadahead = {}
+async function updateStatus(game:'centaura'|'deadahead'){
+    let d = process.env.CENTAURA
+    if(game === 'deadahead'){
+        d = process.env.DEADAHEAD
+    }
+    const url = `https://games.roblox.com/v1/games/${d}/servers/Public?limit=100`
+    let response = await axios.get(url)
+    let data = response.data
+    let ret = []
+    for(var x of data.data){
+        ret.push(x)
+    }
+    let next = data.nextPageCursor
+    while(next !== null){
+        response = await axios.get(`${url}&cursor=${next}`)
+        data = response.data
         for(var x of data.data){
             ret.push(x)
         }
-        return res.status(200).json({data:ret,ok:true,msg:'Data fetched successfully.'})
-    }catch(e){
-        return res.status(500).json({data:[],ok:false,msg:'An error occured.'})
+        next = data.nextPageCursor
+    }
+    if(game === 'deadahead'){
+        deadahead = ret
+    } else{centaura = ret}
+    return {limit:response.headers['x-ratelimit-reset']}
+}
+async function recur(){
+    let limit = await updateStatus("centaura")
+    let limit2 = await updateStatus("deadahead")
+    let delay2 = Math.max(parseInt(limit.limit),parseInt(limit2.limit))
+    console.log(delay2 * 1000)
+    console.log("UPDATED")
+    setTimeout(()=>{
+        recur()
+    },delay2 * 1000)
+}
+recur()
+app.get('/getStatus/:game',async(req:express.Request<requestType>,res:express.Response<responseType>)=>{
+    let game = req.params.game
+    if(game === 'centaura'){
+        res.json({data:centaura,ok:true,msg:'success'})
+    }else if(game === 'deadahead'){
+        res.json({data:deadahead,ok:true,msg:'success'})
     }
 })
 app.listen(3000)

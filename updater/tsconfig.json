@@ -1,1 +1,0 @@
-{  "compilerOptions":{    "forceConsistentCasingInFileNames": true,"target":"es2016",    "module":"commonjs",    "outDir":"./dist",    "rootDir":"./api",    "strict":true,    "skipLibCheck":true,    "esModuleInterop":true  },  "include":["api/**/*.ts"],  "exclude":["node_modules"]}  

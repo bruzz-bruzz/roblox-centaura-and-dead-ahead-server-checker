@@ -1,1 +1,0 @@
-{"watch":["src"],"ignore":["src/**/*.spec.ts"],"ext":"ts,html,css,ejs,json","exec":"npx ts-node src/server.ts"}  
