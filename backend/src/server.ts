@@ -52,7 +52,8 @@ async function updateStatus(game:'centaura'|'deadahead'){
     return {limit:response.headers['x-ratelimit-reset']}
 }
 async function recur(){
-    let limit = await updateStatus("centaura")
+    try {
+        let limit = await updateStatus("centaura")
     let limit2 = await updateStatus("deadahead")
     let delay2 = Math.max(parseInt(limit.limit),parseInt(limit2.limit))
     console.log(delay2 * 1000)
@@ -60,6 +61,12 @@ async function recur(){
     setTimeout(()=>{
         recur()
     },delay2 * 1000)
+    }catch(e){
+        console.log("WAIT")
+        setTimeout(()=>{
+            recur()
+        },60 * 1000)
+    }
 }
 recur()
 app.get('/getStatus/:game',async(req:express.Request<requestType>,res:express.Response<responseType>)=>{
