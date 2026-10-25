@@ -68,8 +68,6 @@ async function updateStatus(game:'centaura'|'deadahead'){
     }
 }
 async function recur(){
-    console.log("DA",deadahead)
-    console.log("CEN",centaura)
     try {
         let limit = await updateStatus("centaura")
         let limit2 = await updateStatus("deadahead")
