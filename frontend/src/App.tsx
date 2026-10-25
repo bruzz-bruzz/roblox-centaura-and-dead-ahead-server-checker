@@ -1,122 +1,82 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+import {useState,useEffect} from 'react'
+import axios from 'axios'
+import daIcon from './assets/DA.webp'
+import Github from './Github'
+import cenIcon from './assets/CA.jpg'
+export default function App(){
+  const [daData,setDAData] = useState<null|any>(null)
+  const [cenData,setCenData] = useState<null|any>(null)
+  async function getDAData(){
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getStatus/deadahead`)
+      setDAData(res.data)
+    } catch (error) {}
+  }
+  async function getCenData(){
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getStatus/centaura`)
+      setCenData(res.data)
+    } catch (error) {}
+  }
+  useEffect(()=>{
+    getDAData()
+    getCenData()
+  },[])
+  return(
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-4 md:p-8">  
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
+        {/* Dead Ahead */}
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+          <div className="flex items-center gap-3 mb-6">
+            <img src={daIcon} className="w-12 h-12 rounded-full" alt="Dead Ahead Icon" />
+            <h2 className="text-2xl font-semibold">Dead Ahead</h2>
+          </div>
+          
+          {daData === null && <p className="text-gray-400">Loading...</p>}
+          {daData !== null && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-400 mb-4">{daData.data.length} servers active</p>
+              {daData.data.map((val:any,idx:any)=>(
+                <div key={idx} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
+                  <h3 className="font-bold text-lg mb-2">Server ID: {val.id.slice(5)}</h3>
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <p>Players: <span className="font-medium">{val.playing} / {val.maxPlayers}</span></p>
+                    <p>Ping: <span className="font-medium">{val.ping}ms</span></p>
+                    <p>FPS: <span className="font-medium">{val.fps}</span></p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        {/* Centaura */}
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg">
+          <div className="flex items-center gap-3 mb-6">
+            <img src={cenIcon} className="w-12 h-12 rounded-full" alt="Centaura Icon" />
+            <h2 className="text-2xl font-semibold">Centaura</h2>
+          </div>
+          
+          {cenData === null && <p className="text-gray-400">Loading...</p>}
+          {cenData !== null && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-400 mb-4">{cenData.data.length} servers active</p>
+              {cenData.data.map((val:any,idx:any)=>(
+                <div key={idx} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
+                  <h3 className="font-bold text-lg mb-2">Server ID: {val.id.slice(5)}</h3>
+                  <div className="grid grid-cols-3 gap-2 text-sm">
+                    <p>Players: <span className="font-medium">{val.playing} / {val.maxPlayers}</span></p>
+                    <p>Ping: <span className="font-medium">{val.ping}ms</span></p>
+                    <p>FPS: <span className="font-medium">{val.fps}</span></p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      </div>
+      <Github profileURL={"https://github.com/bruzz-bruzz"} repoURL={"https://github.com/bruzz-bruzz/ESP32-IoT-Weather-Station"} />
+    </div>
   )
 }
-
-export default App
