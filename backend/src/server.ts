@@ -40,28 +40,32 @@ async function updateStatus(game:'centaura'|'deadahead'){
     if(game === 'deadahead'){
         d = process.env.DEADAHEAD
     }
-    const url = `https://games.roblox.com/v1/games/${d}/servers/Public?limit=100`
-    let response = await axios.get(url)
-    let data = response.data
-    let ret = []
-    for(var x of data.data){
-        ret.push(x)
-    }
-    let next = data.nextPageCursor
-    while(next !== null){
-        response = await axios.get(`${url}&cursor=${next}`)
-        data = response.data
+    try{
+        const url = `https://games.roblox.com/v1/games/${d}/servers/Public?limit=100`
+        let response = await axios.get(url)
+        let data = response.data
+        let ret = []
         for(var x of data.data){
             ret.push(x)
         }
-        next = data.nextPageCursor
+        let next = data.nextPageCursor
+        while(next !== null){
+            response = await axios.get(`${url}&cursor=${next}`)
+            data = response.data
+            for(var x of data.data){
+                ret.push(x)
+            }
+            next = data.nextPageCursor
+        }
+        if(game === 'deadahead'){
+            deadahead = ret
+        } else{
+            centaura = ret
+        }
+        return {limit:response.headers['x-ratelimit-reset']}
+    }catch(e){
+        return {limit:'60'}
     }
-    if(game === 'deadahead'){
-        deadahead = ret
-    } else{
-        centaura = ret
-    }
-    return {limit:response.headers['x-ratelimit-reset']}
 }
 async function recur(){
     try {
