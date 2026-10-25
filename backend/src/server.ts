@@ -43,7 +43,6 @@ async function updateStatus(game:'centaura'|'deadahead'){
     try{
         const url = `https://games.roblox.com/v1/games/${d}/servers/Public?limit=100`
         let response = await axios.get(url)
-        console.log(`Headers for ${game}:`, response.headers)
         let data = response.data
         let ret = []
         for(var x of data.data){
@@ -63,32 +62,25 @@ async function updateStatus(game:'centaura'|'deadahead'){
         } else{
             centaura = ret
         }
-        const reset = response.headers['x-ratelimit-reset']
-        console.log(`Reset header for ${game}:`, reset)
-        return {limit: reset}
+        return {limit:response.headers['x-ratelimit-reset']}
     }catch(e){
-        console.error(`Error updating ${game}:`, e)
         return {limit:'60'}
     }
 }
 async function recur(){
-    console.log("DA",deadahead.length)
-    console.log("CEN",centaura.length)
+    console.log("DA",deadahead)
+    console.log("CEN",centaura)
     try {
-        let res1 = await updateStatus("centaura")
-        let res2 = await updateStatus("deadahead")
-        let limit1 = parseInt(res1.limit)
-        if (isNaN(limit1) || limit1 > 3600) limit1 = 60
-        let limit2 = parseInt(res2.limit)
-        if (isNaN(limit2) || limit2 > 3600) limit2 = 60
-        let delay2 = Math.max(limit1, limit2)
-        console.log("Next update in (s):", delay2)
+        let limit = await updateStatus("centaura")
+        let limit2 = await updateStatus("deadahead")
+        let delay2 = Math.max(parseInt(limit.limit),parseInt(limit2.limit))
+        console.log(delay2 * 1000)
         console.log("UPDATED")
         setTimeout(()=>{
             recur()
         },delay2 * 1000)
     }catch(e){
-        console.log("WAIT", e)
+        console.log("WAIT")
         setTimeout(()=>{
             recur()
         },60 * 1000)
