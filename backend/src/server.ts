@@ -7,8 +7,8 @@ import axios from 'axios'
 dotenv.config()
 const app = express()
 const rateLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
+    windowMs: 15 * 60 * 1000, 
+    max: 60
 })
 app.use(cors({
     origin:process.env.ORIGIN
@@ -23,8 +23,17 @@ type responseType = {
 type requestType = {
     game:"centaura"|'deadahead'
 }
-let centaura = {}
-let deadahead = {}
+type serverType = {
+    id:string,
+    maxPlayers:number,
+    playing:number,
+    playerTokens:never[],
+    players:never[],
+    fps:number,
+    ping:number
+}
+let centaura:serverType[] = []
+let deadahead:serverType[] = []
 async function updateStatus(game:'centaura'|'deadahead'){
     let d = process.env.CENTAURA
     if(game === 'deadahead'){
@@ -48,19 +57,21 @@ async function updateStatus(game:'centaura'|'deadahead'){
     }
     if(game === 'deadahead'){
         deadahead = ret
-    } else{centaura = ret}
+    } else{
+        centaura = ret
+    }
     return {limit:response.headers['x-ratelimit-reset']}
 }
 async function recur(){
     try {
         let limit = await updateStatus("centaura")
-    let limit2 = await updateStatus("deadahead")
-    let delay2 = Math.max(parseInt(limit.limit),parseInt(limit2.limit))
-    console.log(delay2 * 1000)
-    console.log("UPDATED")
-    setTimeout(()=>{
-        recur()
-    },delay2 * 1000)
+        let limit2 = await updateStatus("deadahead")
+        let delay2 = Math.max(parseInt(limit.limit),parseInt(limit2.limit))
+        console.log(delay2 * 1000)
+        console.log("UPDATED")
+        setTimeout(()=>{
+            recur()
+        },delay2 * 1000)
     }catch(e){
         console.log("WAIT")
         setTimeout(()=>{

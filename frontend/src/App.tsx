@@ -5,8 +5,17 @@ import daIcon from './assets/DA.webp'
 import Github from './Github'
 import cenIcon from './assets/CA.jpg'
 export default function App(){
-  const [daData,setDAData] = useState<null|any>(null)
-  const [cenData,setCenData] = useState<null|any>(null)
+  type serverType = {
+    id:string,
+    maxPlayers:number,
+    playing:number,
+    playerTokens:never[],
+    players:never[],
+    fps:number,
+    ping:number
+}
+  const [daData,setDAData] = useState<null|{data:serverType[]}>(null)
+  const [cenData,setCenData] = useState<null|{data:serverType[]}>(null)
   async function getDAData(){
     try {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getStatus/deadahead`)
@@ -39,7 +48,7 @@ export default function App(){
           {daData !== null && (
             <div className="space-y-4">
               <p className="text-sm text-gray-400 mb-4">{daData.data.length} servers active</p>
-              {daData.data.map((val:any,idx:any)=>(
+              {daData.data.map((val:serverType,idx:number)=>(
                 <div key={idx} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                   <h3 className="font-bold text-lg mb-2">Server ID: {val.id.split("-")[0].slice(0,5)}</h3>
                   <div className="grid grid-cols-3 gap-2 text-sm">
@@ -65,7 +74,7 @@ export default function App(){
           {cenData !== null && (
             <div className="space-y-4">
               <p className="text-sm text-gray-400 mb-4">{cenData.data.length} servers active</p>
-              {cenData.data.map((val:any,idx:any)=>(
+              {cenData.data.map((val:serverType,idx:number)=>(
                 <div key={idx} className="border border-gray-600 rounded-lg p-4 bg-gray-700">
                   <h3 className="font-bold text-lg mb-2">Server ID: {val.id.split("-")[0].slice(0,5)}</h3>
                   <div className="grid grid-cols-3 gap-2 text-sm">
