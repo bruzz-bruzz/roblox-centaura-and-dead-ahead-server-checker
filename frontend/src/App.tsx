@@ -20,14 +20,12 @@ export default function App(){
     try {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getStatus/deadahead`)
       setDAData(res.data)
-      console.log(res.data)
     } catch (error) {}
   }
   async function getCenData(){
     try {
       const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/getStatus/centaura`)
       setCenData(res.data)
-      console.log(res.data)
     } catch (error) {}
   }
   useEffect(()=>{
